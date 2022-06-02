@@ -16,7 +16,7 @@ ____________
 
 ### Implementations
 
-1. Iterative
+1. [Iterative](https://github.com/zalgonoise/kchop/blob/master/iterative/chop.go#L7)
 
 This implementation, as suggested in the original document, will perform a binary search using a classic iterative approach, within a function.
 
