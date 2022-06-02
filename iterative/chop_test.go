@@ -140,11 +140,16 @@ func TestChop(t *testing.T) {
 			wants:  3,
 		},
 		{
+			target: 9,
+			values: []int{1, 3, 5, 7, 9},
+			wants:  4,
+		},
+		// idx: 24
+		{
 			target: 0,
 			values: []int{1, 3, 5, 7, 9},
 			wants:  -1,
 		},
-		// idx: 24
 		{
 			target: 2,
 			values: []int{1, 3, 5, 7, 9},
@@ -155,14 +160,19 @@ func TestChop(t *testing.T) {
 			values: []int{1, 3, 5, 7, 9},
 			wants:  -1,
 		},
+		// idx: 27
 		{
 			target: 6,
 			values: []int{1, 3, 5, 7, 9},
 			wants:  -1,
 		},
-		// idx: 27
 		{
 			target: 8,
+			values: []int{1, 3, 5, 7, 9},
+			wants:  -1,
+		},
+		{
+			target: 10,
 			values: []int{1, 3, 5, 7, 9},
 			wants:  -1,
 		},
