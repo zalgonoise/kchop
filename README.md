@@ -20,3 +20,20 @@ ____________
 
 This implementation, as suggested in the original document, will perform a binary search using a classic iterative approach, within a function.
 
+This approach seems very verbose and long, with a lot of complexity in the loops / conditionals it contains. Although this is diminished a bit with added documentation, it still makes it hard to review and follow.
+
+As a first approach, it seems straight-forward and simple to write, however -- so this took the least amount of time to write and get working; with no major issues or blockers.
+
+2. [Recursive](https://github.com/zalgonoise/kchop/blob/master/recursive/chop.go#L11)
+
+Also suggested in the original document, this implementation will focus on a recursive pattern for the same algorithm. The way this is done is by adding a new (private) function with a slightly different signature:
+
+```go
+chop(t int, v []int, c int) int
+```
+
+This signature will be close to the original signature (for the `Chop()` function), adding one more parameter for the carrying index value. The idea is to break-down the slice with a binary search pattern until it only holds one value, which is compared to the target.
+
+Implementing this algorithm required more fine-tuning by the end of the first draft, as this one started to raise _off-by-one_ errors. This was easily corrected by ensuring that, if the target value ends up in the second, bigger slice, [the carrying index must be incremented by the length of the first, smaller slice](https://github.com/zalgonoise/kchop/blob/master/recursive/chop.go#L57).
+
+All in all, this approach seems to bring more readability, and also a bit more compact than the Iterative solution. Once it's working it feels more like magic and less like a repetitive action.
