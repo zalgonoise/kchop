@@ -37,3 +37,21 @@ This signature will be close to the original signature (for the `Chop()` functio
 Implementing this algorithm required more fine-tuning by the end of the first draft, as this one started to raise _off-by-one_ errors. This was easily corrected by ensuring that, if the target value ends up in the second, bigger slice, [the carrying index must be incremented by the length of the first, smaller slice](https://github.com/zalgonoise/kchop/blob/master/recursive/chop.go#L57).
 
 All in all, this approach seems to bring more readability, and also a bit more compact than the Iterative solution. Once it's working it feels more like magic and less like a repetitive action.
+
+3. [Functional](https://github.com/zalgonoise/kchop/blob/master/functional/chop.go#L7)
+
+Similarly to the previous implementation, the original document also suggests a functional approach to this algorithm. As such, we want to keep in mind the statlessness / immutability in functional programming, taking functions as first-class citizens -- also while keeping it simple and not excessively abstract or complex.
+
+For this task, three functions are introduced: `reduce()`, `reduceR()` and `match()`. Here are their signatures: 
+
+```go
+reduce(t int, v []int) (s []int, c int)
+reduceR(t, c int, v []int) (s []int, i int)
+match(t, c int, v []int) int
+```
+
+The first two functions are to approach the same task -- the actual binary search, returning a new, smaller slice, recursively (a hint from the previous implementation). It also returns an index carry value to serve as reference in case there is a match. This process is repeated until the slice only contains zero or one elements, when it exits.
+
+Lastly, these values are fed into the `match()` function, which takes in the target value, the index carry value, and the (new, single or no-value) list to match its content to the target. If there are no values in the list, it returns `-1`. If there is an element in the list and it doesn't match the target, returns `-1`. If it matches, however, it will return the carry value.
+
+There weren't any major hiccups when writing this implementation as the process in itself is very straight-forward. A great thing about this pattern is readability -- surely it will be one of the most easily readable and testable solutions. Its downsides will surely be performance with the number of operations and allocations involved.
