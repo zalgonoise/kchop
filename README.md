@@ -97,3 +97,35 @@ Since the same would occur if inserting while iterating from the end of the list
 - taking the larger slice's first item as the root
 - iterating upwards through the remaining large items, inserting them into the `Node`
 - iterating downwards through the small slice of items, inserting them into the `Node`
+
+5. [Index-Based](https://github.com/zalgonoise/kchop/blob/master/inspector/chop.go#L7)
+
+This last approach took some time to think of, to provide an original approach that also worked, and wasn't a refactored copy (or just a mix) of the other approaches above.
+
+In this approach I figured that in all approaches the indexes are being more or less disregarded -- or in other words, the index is the cumbersome part in the logic where it needs to either be carried, or is the always mutable piece of data (at a first glance).
+
+As such, why not simply base the whole logic off of the index of the slice? That is where this _inspector_ approach comes in.
+
+It introduces a `Range` struct to define start and end points for the look-up, and four methods: `Diff()` to return the difference of the start and end points (how many items in the range), `Mid()` to return the index of the middle position in the range, and two similar methods: `Smaller()` and `Larger()`. These last two will apply the binary search pattern by reducing the range according to the value comparison:
+
+
+```go
+type Range struct {
+	start int
+	end   int
+}
+
+func (r *Range) Diff() int
+func (r *Range) Mid() int
+func (r *Range) Smaller() *Range
+func (r *Range) Larger() *Range
+```
+
+There are also two other functions, one public (`Search()`) and a similarly named private one. The public function is simplified for external use (checking the input slice's length, initializing the "default" range) while the private function will recursively search through the slice, applying a binary search pattern to reduce the range.
+
+it will recursively break the range down until its difference is 2 or lower, where it finally compares it the _final_ values, returning the appropriate index on a match or `-1` if non-existent. 
+
+```go
+func search(t int, v []int, r *Range) int
+func Search(t int, v []int) int
+```
