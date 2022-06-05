@@ -29,7 +29,7 @@ As a first approach, it seems straight-forward and simple to write, however -- s
 Also suggested in the original document, this implementation will focus on a recursive pattern for the same algorithm. The way this is done is by adding a new (private) function with a slightly different signature:
 
 ```go
-chop(t int, v []int, c int) int
+func chop(t int, v []int, c int) int
 ```
 
 This signature will be close to the original signature (for the `Chop()` function), adding one more parameter for the carrying index value. The idea is to break-down the slice with a binary search pattern until it only holds one value, which is compared to the target.
@@ -45,9 +45,9 @@ Similarly to the previous implementation, the original document also suggests a 
 For this task, three functions are introduced: `reduce()`, `reduceR()` and `match()`. Here are their signatures: 
 
 ```go
-reduce(t int, v []int) (s []int, c int)
-reduceR(t, c int, v []int) (s []int, i int)
-match(t, c int, v []int) int
+func reduce(t int, v []int) (s []int, c int)
+func reduceR(t, c int, v []int) (s []int, i int)
+func match(t, c int, v []int) int
 ```
 
 The first two functions are to approach the same task -- the actual binary search, returning a new, smaller slice, recursively (a hint from the previous implementation). It also returns an index carry value to serve as reference in case there is a match. This process is repeated until the slice only contains zero or one elements, when it exits.
@@ -55,3 +55,45 @@ The first two functions are to approach the same task -- the actual binary searc
 Lastly, these values are fed into the `match()` function, which takes in the target value, the index carry value, and the (new, single or no-value) list to match its content to the target. If there are no values in the list, it returns `-1`. If there is an element in the list and it doesn't match the target, returns `-1`. If it matches, however, it will return the carry value.
 
 There weren't any major hiccups when writing this implementation as the process in itself is very straight-forward. A great thing about this pattern is readability -- surely it will be one of the most easily readable and testable solutions. Its downsides will surely be performance with the number of operations and allocations involved.
+
+4. [Binary Search Tree (OOP)](https://github.com/zalgonoise/kchop/blob/master/bsearch/chop.go#L12)
+
+This implementation will focus on the actual data structure that is allowing this type of query to be efficient: binary search trees.
+
+For this, a struct with two methods is introduced, as well as an initializer function:
+
+```go
+type Node struct {
+	idx   int
+	val   int
+	small *Node
+	large *Node
+}
+
+func (n *Node) Insert(v, idx int)
+func (n *Node) Search(target int) (idx int)
+
+func Ordered(v ...int) *Node
+```
+
+The downside of this particular approach is that the `Chop()` function will first load all the values into memory (as a pointer to a `Node` object), and then perform a query on it. The query in itself will be super efficient and reliable -- so this type of implementation would be more useful if the interactions happened with the `Node` object directly, instead of loading the data into memory on each query.
+
+In terms of accuracy, I didn't find any _off-by-one_ issues when writing this implementation. What I struggled the most was to find a decent `init()` function for it, considering the input was an ordered list -- if it was unordered, the `Node` object could simply be initialized with the first element of the slice as its root, and then calling the `Insert()` method on each remaining value in the slice.
+
+Being an ordered list of integers, the approach above would make the whole implementation useless as it the binary search tree implementation would not benefit at all in comparison to an purely iterative approach:
+
+```
+[1]
+ +- small: <nil>
+ +- large: [3]
+            +- small: <nil>
+            +- large: [5]
+                       +- small: <nil>
+                       +- large: [7]
+```
+
+Since the same would occur if inserting while iterating from the end of the list to the beginning, the root is initialized with:
+- splitting the input slice in two: smaller and larger slices.
+- taking the larger slice's first item as the root
+- iterating upwards through the remaining large items, inserting them into the `Node`
+- iterating downwards through the small slice of items, inserting them into the `Node`
